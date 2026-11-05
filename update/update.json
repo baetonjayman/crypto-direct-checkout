@@ -1,10 +1,10 @@
 {
-  "version": "1.3.6",
-  "package": "https://raw.githubusercontent.com/baetonjayman/crypto-direct-checkout/main/update/crypto-direct-checkout-1.3.6.zip",
-  "sha256": "70d82d99c2b8303b6b12c16b41d5b78bcdef8c4811ddaa9c0343630ce34585c4",
-  "signature": "Ibr9jpneutqnXQ6IvGcGotrSH5e9fnfw0OvLp2f8H1GzsCJIrLG1Lc0KNEkVcBFdnvCtzBR4T+9QmttoEibJCg==",
+  "version": "1.3.7",
+  "package": "https://raw.githubusercontent.com/baetonjayman/crypto-direct-checkout/main/update/crypto-direct-checkout-1.3.7.zip",
+  "sha256": "46af5ea42063fb01137ef85cdb53bf37e078096e98ec2dc054ab24dab6077dec",
+  "signature": "ViS0W8ET+mgBcIrrwxN0n428uyBPeRMxU5fHzHgMuhB8D8PpBP04fMXNNDr1gcVOM+3T6iavSMbqVweXzS5jDQ==",
   "requires": "6.0",
   "requires_php": "7.4",
   "tested": "6.9",
-  "changelog": "Removed WooCommerce's confusing 'Pay' button from crypto orders (the payment box is how you pay). Pressing 'Pay' again can no longer change an order's amount or timer. My Account \u2192 View order now shows the payment box."
+  "changelog": "While a crypto order waits for payment, the page now says 'Complete your payment' instead of 'Order received'. Help links show a clear arrow."
 }

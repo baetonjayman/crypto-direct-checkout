@@ -23,6 +23,47 @@ class CDC_Payments {
 		add_filter( 'woocommerce_cancel_unpaid_order', array( __CLASS__, 'keep_until_timer_ends' ), 10, 2 );
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( __CLASS__, 'order_actions' ), 10, 2 );
 		add_action( 'woocommerce_view_order', array( __CLASS__, 'show_box_on_view_order' ), 5 );
+		add_filter( 'woocommerce_thankyou_order_received_text', array( __CLASS__, 'received_text' ), 20, 2 );
+		add_filter( 'woocommerce_endpoint_order-received_title', array( __CLASS__, 'received_title' ), 20 );
+	}
+
+	/** The crypto order on the order-received page, if any. */
+	private static function current_received_order() {
+		global $wp;
+		$id = isset( $wp->query_vars['order-received'] ) ? absint( $wp->query_vars['order-received'] ) : 0;
+		$o  = $id ? wc_get_order( $id ) : null;
+		return ( $o && CDC_Chains::for_order( $o ) ) ? $o : null;
+	}
+
+	/** Don't say "order received" before the money has arrived. */
+	public static function received_text( $text, $order ) {
+		if ( ! $order instanceof WC_Order || ! CDC_Chains::for_order( $order ) ) {
+			return $text;
+		}
+		switch ( self::status_of( $order ) ) {
+			case 'waiting':
+				return 'Your order is reserved. Complete your payment below to confirm it.';
+			case 'seen':
+				return 'We can see your payment. Your order is confirmed as soon as the network confirms it.';
+			case 'expired':
+				return 'This order was not paid in time.';
+			case 'late_paid':
+				return 'Thank you. We received your payment — the store will confirm your order shortly.';
+			default:
+				return 'Thank you. Your payment was received and your order is confirmed.';
+		}
+	}
+
+	public static function received_title( $title ) {
+		$order = self::current_received_order();
+		if ( ! $order ) {
+			return $title;
+		}
+		$status = self::status_of( $order );
+		if ( 'waiting' === $status || 'seen' === $status ) {
+			return 'Complete your payment';
+		}
+		return 'expired' === $status ? 'Order not paid' : $title;
 	}
 
 	/**
