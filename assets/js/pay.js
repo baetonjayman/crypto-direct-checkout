@@ -44,6 +44,19 @@
 		} catch (e) { qrEl.style.display = 'none'; }
 	}
 
+	/* ---- "Show QR code" on phones (a phone can't scan its own screen) ---- */
+	var scan = $('scan');
+	var toggle = scan && scan.querySelector('.cdc-scan-toggle');
+	if (toggle) {
+		toggle.addEventListener('click', function () {
+			var open = !scan.hasAttribute('data-open');
+			if (open) { scan.setAttribute('data-open', ''); } else { scan.removeAttribute('data-open'); }
+			toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+			var label = toggle.querySelector('span');
+			if (label) { label.textContent = open ? 'Hide QR code' : 'Show QR code'; }
+		});
+	}
+
 	/* ---- Copy buttons ---- */
 	function copyText(text) {
 		if (navigator.clipboard && window.isSecureContext) {

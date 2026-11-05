@@ -31,6 +31,8 @@ class CDC_Pay_Page {
 		$symbol     = $chain->symbol();
 		$rate       = (float) $order->get_meta( '_cdc_rate' );
 		$txid       = (string) $order->get_meta( '_cdc_txid' );
+		$qr_value   = $chain->qr_value( $wallet, $amount );
+		$qr_amount  = $qr_value !== $wallet;
 
 		wp_enqueue_style( 'cdc-pay', CDC_URL . 'assets/css/pay.css', array(), CDC_VERSION );
 		wp_enqueue_script( 'cdc-qrcode', CDC_URL . 'assets/js/qrcode.js', array(), '1.5.2', true );
@@ -62,37 +64,54 @@ class CDC_Pay_Page {
 
 			<!-- Waiting / expired view -->
 			<div class="cdc-body cdc-view-pay">
-				<h2 id="cdc-heading" class="cdc-title">Pay with <?php echo esc_html( $chain->label() ); ?></h2>
+				<h2 id="cdc-heading" class="screen-reader-text">Pay with <?php echo esc_html( $chain->label() ); ?></h2>
 
-				<div class="cdc-field">
-					<span class="cdc-label">Send exactly</span>
-					<div class="cdc-row">
-						<span class="cdc-amount"><span data-cdc="amount"><?php echo esc_html( $exact ); ?></span> <small><?php echo esc_html( $symbol ); ?></small></span>
-						<button type="button" class="cdc-copy" data-copy="<?php echo esc_attr( $exact ); ?>" aria-label="Copy amount">
-							<?php echo self::copy_icon(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-							<span>Copy</span>
-						</button>
+				<div class="cdc-grid">
+					<div class="cdc-card">
+						<div class="cdc-line">
+							<div class="cdc-line-main">
+								<span class="cdc-label">Send exactly</span>
+								<span class="cdc-amount"><span data-cdc="amount"><?php echo esc_html( $exact ); ?></span> <small><?php echo esc_html( $symbol ); ?></small></span>
+								<?php if ( $rate ) : ?>
+									<span class="cdc-sub"><?php echo esc_html( sprintf( '≈ %s %s · price locked', number_format( (float) $order->get_total(), 2 ), $order->get_currency() ) ); ?></span>
+								<?php endif; ?>
+							</div>
+							<button type="button" class="cdc-copy" data-copy="<?php echo esc_attr( $exact ); ?>" aria-label="Copy amount">
+								<?php echo self::copy_icon(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+								<span>Copy</span>
+							</button>
+						</div>
+						<div class="cdc-line">
+							<div class="cdc-line-main">
+								<span class="cdc-label">To this address <span class="cdc-net"><?php echo esc_html( $chain->network() ); ?></span></span>
+								<code class="cdc-address" aria-label="<?php echo esc_attr( $wallet ); ?>"><?php echo self::address_groups( $wallet ); // phpcs:ignore WordPress.Security.EscapeOutput ?></code>
+							</div>
+							<button type="button" class="cdc-copy" data-copy="<?php echo esc_attr( $wallet ); ?>" aria-label="Copy wallet address">
+								<?php echo self::copy_icon(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+								<span>Copy</span>
+							</button>
+						</div>
+						<p class="cdc-hint">Send the exact amount — the last digits identify your order. After pasting, check the <strong>bold first and last 4</strong> characters match.</p>
 					</div>
-					<?php if ( $rate ) : ?>
-						<span class="cdc-hint"><?php echo esc_html( sprintf( '≈ %s %s · price locked while the timer runs', number_format( (float) $order->get_total(), 2 ), $order->get_currency() ) ); ?></span>
-					<?php endif; ?>
-					<span class="cdc-hint">The last digits are unique to your order — they're how we recognise your payment.</span>
-				</div>
 
-				<div class="cdc-field cdc-field-wallet">
-					<div class="cdc-qr" data-cdc="qr" data-value="<?php echo esc_attr( $chain->qr_value( $wallet, $amount ) ); ?>" role="img" aria-label="QR code for this payment"></div>
-					<div class="cdc-wallet">
-						<span class="cdc-label">To this wallet address</span>
-						<code class="cdc-address"><?php echo esc_html( $wallet ); ?></code>
-						<button type="button" class="cdc-copy" data-copy="<?php echo esc_attr( $wallet ); ?>" aria-label="Copy wallet address">
-							<?php echo self::copy_icon(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-							<span>Copy address</span>
+					<div class="cdc-scan" data-cdc="scan">
+						<button type="button" class="cdc-scan-toggle" aria-expanded="false" aria-controls="cdc-qr-panel">
+							<?php echo self::qr_icon(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+							<span>Show QR code</span>
 						</button>
+						<div class="cdc-scan-panel" id="cdc-qr-panel">
+							<div class="cdc-qr" data-cdc="qr" data-value="<?php echo esc_attr( $qr_value ); ?>" role="img" aria-label="QR code for this payment"></div>
+							<span class="cdc-scan-cap"><?php echo esc_html( $qr_amount ? 'Scan with your wallet — amount included' : 'Scan for the address, then enter the amount' ); ?></span>
+						</div>
+						<?php if ( $qr_amount ) : ?>
+							<a class="cdc-btn cdc-open-wallet" href="<?php echo esc_url( $qr_value, array( 'bitcoin' ) ); ?>">Open in wallet app</a>
+						<?php endif; ?>
 					</div>
 				</div>
 
 				<p class="cdc-warn">
-					<strong>Network: <?php echo esc_html( $chain->network() ); ?> only.</strong> Sending another coin, or <?php echo esc_html( $symbol ); ?> on another network, cannot be recovered.
+					<?php echo self::warn_icon(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+					<span>Send only <strong><?php echo esc_html( $symbol ); ?></strong> on <strong><?php echo esc_html( $chain->network() ); ?></strong>. Anything else is lost.</span>
 				</p>
 
 				<p class="cdc-seen-note">
@@ -152,6 +171,29 @@ class CDC_Pay_Page {
 			'seen'      => 'Payment seen — confirming',
 		);
 		return isset( $map[ $status ] ) ? $map[ $status ] : '';
+	}
+
+
+	/** Address in blocks of 4 so it's easy to check. Copying the text gives no spaces. */
+	public static function address_groups( $address ) {
+		$address = (string) $address;
+		if ( strlen( $address ) <= 8 ) {
+			return '<span class="cdc-g cdc-key">' . esc_html( $address ) . '</span>';
+		}
+		// The first 4 and last 4 characters stand out — they're what people check.
+		$out = '<span class="cdc-g cdc-key">' . esc_html( substr( $address, 0, 4 ) ) . '</span>';
+		foreach ( str_split( substr( $address, 4, -4 ), 4 ) as $g ) {
+			$out .= '<span class="cdc-g">' . esc_html( $g ) . '</span>';
+		}
+		return $out . '<span class="cdc-g cdc-key">' . esc_html( substr( $address, -4 ) ) . '</span>';
+	}
+
+	private static function qr_icon() {
+		return '<svg class="cdc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3M21 14v7h-7"/></svg>';
+	}
+
+	private static function warn_icon() {
+		return '<svg class="cdc-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17.5v.5"/></svg>';
 	}
 
 	private static function copy_icon() {
