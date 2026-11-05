@@ -2,7 +2,7 @@
 /**
  * Plugin Name:          Crypto Direct Checkout
  * Description:          Accept USDT (Tron, Ethereum) and Bitcoin straight into your own wallet. No middleman holds the money. Payments are detected automatically.
- * Version:              1.3.5
+ * Version:              1.3.6
  * Author:               Banesto
  * Requires at least:    6.0
  * Requires PHP:         7.4
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CDC_VERSION', '1.3.5' );
+define( 'CDC_VERSION', '1.3.6' );
 define( 'CDC_FILE', __FILE__ );
 define( 'CDC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CDC_URL', plugin_dir_url( __FILE__ ) );

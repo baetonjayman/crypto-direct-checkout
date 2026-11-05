@@ -21,6 +21,41 @@ class CDC_Payments {
 		add_action( 'init', array( __CLASS__, 'ensure_cron' ) );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
 		add_filter( 'woocommerce_cancel_unpaid_order', array( __CLASS__, 'keep_until_timer_ends' ), 10, 2 );
+		add_filter( 'woocommerce_my_account_my_orders_actions', array( __CLASS__, 'order_actions' ), 10, 2 );
+		add_action( 'woocommerce_view_order', array( __CLASS__, 'show_box_on_view_order' ), 5 );
+	}
+
+	/**
+	 * WooCommerce's own "Pay" button doesn't make sense for crypto: the payment box is how you pay.
+	 * On the order-received page it's removed; elsewhere (My Account) it opens the payment box.
+	 */
+	public static function order_actions( $actions, $order ) {
+		if ( ! isset( $actions['pay'] ) || ! CDC_Chains::for_order( $order ) ) {
+			return $actions;
+		}
+		if ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) {
+			unset( $actions['pay'] );
+		} else {
+			$actions['pay']['url'] = $order->get_checkout_order_received_url();
+		}
+		return $actions;
+	}
+
+	/** My Account → Orders → View also shows the payment box. */
+	public static function show_box_on_view_order( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( $order && CDC_Chains::for_order( $order ) ) {
+			CDC_Pay_Page::render( $order_id );
+		}
+	}
+
+	/** The order already has a running payment on this coin — keep its amount and timer. */
+	public static function still_valid( WC_Order $order, CDC_Chain $chain ) {
+		return $chain->id() === (string) $order->get_meta( '_cdc_chain' )
+			&& 'pending' === $order->get_status()
+			&& (int) $order->get_meta( '_cdc_amount_micro' ) > 0
+			&& (int) $order->get_meta( '_cdc_expires' ) > time()
+			&& $chain->same_address( $order->get_meta( '_cdc_wallet' ), $chain->wallet() );
 	}
 
 	/* ---------- Cron ---------- */

@@ -152,6 +152,14 @@ abstract class CDC_Gateway_Base extends WC_Payment_Gateway {
 			return array( 'result' => 'failure' );
 		}
 
+		// Already set up and still running (e.g. the customer pressed "Pay" again): never change the amount.
+		if ( CDC_Payments::still_valid( $order, $this->chain ) ) {
+			return array(
+				'result'   => 'success',
+				'redirect' => $this->get_return_url( $order ),
+			);
+		}
+
 		// Stop bots from filling up all unique amounts with fake orders.
 		if ( ! CDC_Payments::allow_new_order_from_ip() ) {
 			wc_add_notice( 'You have several unpaid crypto orders already. Please pay or wait for them to expire before starting another.', 'error' );
