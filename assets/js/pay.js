@@ -44,6 +44,14 @@
 		} catch (e) { qrEl.style.display = 'none'; }
 	}
 
+	/* ---- Block themes print their own "Order received" heading; keep it honest ---- */
+	function syncHeading(st) {
+		var text = cfg.headings && cfg.headings[st];
+		var h = document.querySelector('.wc-block-order-confirmation-status h1, .wc-block-order-confirmation-status h2');
+		if (h && text) { h.textContent = text; }
+	}
+	syncHeading(cfg.status);
+
 	/* ---- Phones: QR goes behind a button (a phone can't scan its own screen) ---- */
 	if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
 		box.classList.add('cdc-touch');
@@ -100,6 +108,7 @@
 		if (!next || next === state) { return; }
 		state = next;
 		box.setAttribute('data-state', next);
+		syncHeading(next);
 		var pill = $('pill');
 		if (pill) { pill.textContent = PILL[next] || ''; }
 		if (paidText) {
@@ -129,6 +138,7 @@
 			bar.style.transform = 'scaleX(' + frac + ')';
 		}
 		if (left === 0 && state === 'waiting') {
+			syncHeading('expired');
 			poll(); // Ask the server to confirm the expiry.
 		}
 	}

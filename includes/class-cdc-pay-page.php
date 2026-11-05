@@ -22,7 +22,7 @@ class CDC_Pay_Page {
 			return;
 		}
 
-		$status     = CDC_Payments::status_of( $order );
+		$status     = CDC_Payments::page_status( $order );
 		$expires_in = max( 0, (int) $order->get_meta( '_cdc_expires' ) - time() );
 		$total_secs = max( 60, (int) $order->get_meta( '_cdc_expires' ) - (int) $order->get_meta( '_cdc_created' ) );
 		$exact      = $chain->format( $amount );
@@ -47,6 +47,11 @@ class CDC_Pay_Page {
 			'totalSecs'  => $total_secs,
 			'txidRegex'  => $chain->txid_js_pattern(),
 			'network'    => $chain->network(),
+			'headings'   => array(
+				'waiting' => 'Complete your payment',
+				'seen'    => 'Complete your payment',
+				'expired' => 'Order not paid',
+			),
 		);
 		?>
 		<section class="cdc-pay" data-state="<?php echo esc_attr( $status ); ?>" data-config="<?php echo esc_attr( wp_json_encode( $config ) ); ?>" aria-labelledby="cdc-heading">

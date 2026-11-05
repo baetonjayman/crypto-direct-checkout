@@ -35,12 +35,21 @@ class CDC_Payments {
 		return ( $o && CDC_Chains::for_order( $o ) ) ? $o : null;
 	}
 
+	/** Like status_of(), but a waiting order whose timer has run out counts as expired. */
+	public static function page_status( WC_Order $order ) {
+		$status = self::status_of( $order );
+		if ( 'waiting' === $status && (int) $order->get_meta( '_cdc_expires' ) < time() ) {
+			return 'expired';
+		}
+		return $status;
+	}
+
 	/** Don't say "order received" before the money has arrived. */
 	public static function received_text( $text, $order ) {
 		if ( ! $order instanceof WC_Order || ! CDC_Chains::for_order( $order ) ) {
 			return $text;
 		}
-		switch ( self::status_of( $order ) ) {
+		switch ( self::page_status( $order ) ) {
 			case 'waiting':
 				return 'Your order is reserved. Complete your payment below to confirm it.';
 			case 'seen':
@@ -59,7 +68,7 @@ class CDC_Payments {
 		if ( ! $order ) {
 			return $title;
 		}
-		$status = self::status_of( $order );
+		$status = self::page_status( $order );
 		if ( 'waiting' === $status || 'seen' === $status ) {
 			return 'Complete your payment';
 		}
@@ -628,7 +637,7 @@ class CDC_Payments {
 
 		return new WP_REST_Response(
 			array(
-				'status'     => self::status_of( $order ),
+				'status'     => self::page_status( $order ),
 				'expires_in' => max( 0, (int) $order->get_meta( '_cdc_expires' ) - time() ),
 			),
 			200,
@@ -650,7 +659,7 @@ class CDC_Payments {
 		set_transient( $limit_key, $tries + 1, 10 * MINUTE_IN_SECONDS );
 
 		$result           = self::verify_txid( $order, $req->get_param( 'txid' ) );
-		$result['status'] = self::status_of( wc_get_order( $order->get_id() ) );
+		$result['status'] = self::page_status( wc_get_order( $order->get_id() ) );
 		return new WP_REST_Response( $result, 200, array( 'Cache-Control' => 'no-store' ) );
 	}
 
