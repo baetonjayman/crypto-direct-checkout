@@ -1,0 +1,356 @@
+/* Crypto Direct Checkout — payment box.
+   Colours are mixed from the theme's own text colour, so the box looks
+   right on both light and dark store themes. */
+
+.cdc-pay {
+	--cdc-accent: #0f9d76;
+	--cdc-warn: #b45309;
+	--cdc-danger: #dc2626;
+	--cdc-line: rgba(127, 127, 127, 0.22);
+	--cdc-soft: rgba(127, 127, 127, 0.06);
+	--cdc-muted: rgba(127, 127, 127, 1);
+	--cdc-radius: 16px;
+	--cdc-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+	box-sizing: border-box;
+	max-width: 600px;
+	margin: 32px 0;
+	padding: 24px;
+	border: 1px solid var(--cdc-line);
+	border-radius: 20px;
+	background: var(--cdc-soft);
+	font: inherit;
+	line-height: 1.5;
+	animation: cdc-in 320ms var(--cdc-ease) both;
+}
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+	.cdc-pay {
+		--cdc-line: color-mix(in srgb, currentColor 14%, transparent);
+		--cdc-soft: color-mix(in srgb, currentColor 4%, transparent);
+		--cdc-muted: color-mix(in srgb, currentColor 62%, transparent);
+	}
+}
+.cdc-pay *,
+.cdc-pay *::before,
+.cdc-pay *::after { box-sizing: inherit; }
+
+@keyframes cdc-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: none; }
+}
+
+/* Header: status pill + timer */
+.cdc-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+.cdc-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	border: 1px solid var(--cdc-line);
+	border-radius: 999px;
+	font-size: 14px;
+	font-weight: 600;
+}
+.cdc-dot {
+	position: relative;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--cdc-warn);
+}
+.cdc-pay[data-state="waiting"] .cdc-dot::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: inherit;
+	animation: cdc-ping 1.6s var(--cdc-ease) infinite;
+}
+@keyframes cdc-ping {
+	from { transform: scale(1); opacity: 0.7; }
+	to { transform: scale(2.8); opacity: 0; }
+}
+.cdc-pay[data-state="paid"] .cdc-dot,
+.cdc-pay[data-state="late_paid"] .cdc-dot { background: var(--cdc-accent); }
+.cdc-pay[data-state="expired"] .cdc-dot { background: var(--cdc-danger); }
+
+.cdc-timer {
+	font-variant-numeric: tabular-nums;
+	font-size: 15px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+.cdc-timer.is-low { color: var(--cdc-danger); }
+
+.cdc-progress {
+	height: 3px;
+	margin: 16px 0 24px;
+	border-radius: 3px;
+	background: var(--cdc-line);
+	overflow: hidden;
+}
+.cdc-progress span {
+	display: block;
+	height: 100%;
+	width: 100%;
+	background: var(--cdc-accent);
+	transform-origin: left center;
+	transition: transform 1s linear;
+}
+
+/* Body */
+.cdc-title {
+	margin: 0 0 16px;
+	font-size: 22px;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+}
+.cdc-field {
+	padding: 16px;
+	margin-bottom: 16px;
+	border: 1px solid var(--cdc-line);
+	border-radius: var(--cdc-radius);
+}
+.cdc-label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 13px;
+	color: var(--cdc-muted);
+}
+.cdc-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+.cdc-amount {
+	font-size: 32px;
+	font-weight: 700;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
+}
+.cdc-amount small {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--cdc-muted);
+	letter-spacing: 0;
+}
+.cdc-hint {
+	display: block;
+	margin-top: 8px;
+	font-size: 13px;
+	color: var(--cdc-muted);
+}
+
+.cdc-field-wallet {
+	display: grid;
+	grid-template-columns: 136px 1fr;
+	gap: 16px;
+	align-items: center;
+}
+.cdc-qr {
+	width: 136px;
+	height: 136px;
+	padding: 8px;
+	border-radius: 12px;
+	background: #fff; /* QR codes need a light background to scan. */
+}
+.cdc-qr svg,
+.cdc-qr img { display: block; width: 100%; height: 100%; }
+.cdc-wallet { min-width: 0; }
+.cdc-address {
+	display: block;
+	margin-bottom: 12px;
+	padding: 0;
+	background: none;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 14px;
+	line-height: 1.5;
+	word-break: break-all;
+	color: inherit;
+}
+
+/* Buttons */
+.cdc-copy,
+.cdc-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 40px;
+	padding: 8px 16px;
+	border: 1px solid var(--cdc-line);
+	border-radius: 12px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: transform 180ms var(--cdc-ease), border-color 180ms var(--cdc-ease), background-color 180ms var(--cdc-ease);
+}
+.cdc-copy:hover,
+.cdc-btn:hover { transform: translateY(-1px); border-color: var(--cdc-accent); }
+.cdc-copy:active,
+.cdc-btn:active { transform: translateY(0) scale(0.98); }
+.cdc-copy:focus-visible,
+.cdc-btn:focus-visible,
+.cdc-txid input:focus-visible,
+.cdc-more summary:focus-visible {
+	outline: 2px solid var(--cdc-accent);
+	outline-offset: 2px;
+}
+.cdc-copy.is-done { border-color: var(--cdc-accent); color: var(--cdc-accent); }
+.cdc-icon {
+	width: 16px;
+	height: 16px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.cdc-btn {
+	background: var(--cdc-accent);
+	border-color: var(--cdc-accent);
+	color: #fff;
+	white-space: nowrap;
+}
+.cdc-btn:hover { filter: brightness(1.06); }
+.cdc-btn[disabled] { opacity: 0.6; cursor: progress; transform: none; }
+.cdc-spinner {
+	display: none;
+	width: 16px;
+	height: 16px;
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: cdc-spin 700ms linear infinite;
+}
+.cdc-btn.is-loading .cdc-spinner { display: inline-block; }
+@keyframes cdc-spin { to { transform: rotate(360deg); } }
+
+/* Notes */
+.cdc-warn {
+	margin: 0 0 16px;
+	padding: 12px 16px;
+	border-radius: 12px;
+	border: 1px solid rgba(180, 83, 9, 0.35);
+	background: rgba(180, 83, 9, 0.08);
+	font-size: 14px;
+}
+.cdc-expired-note {
+	display: none;
+	margin: 0 0 16px;
+	padding: 12px 16px;
+	border-radius: 12px;
+	border: 1px solid rgba(220, 38, 38, 0.35);
+	background: rgba(220, 38, 38, 0.07);
+	font-size: 14px;
+}
+.cdc-pay[data-state="expired"] .cdc-expired-note { display: block; }
+.cdc-seen-note {
+	display: none;
+	margin: 0 0 16px;
+	padding: 12px 16px;
+	border-radius: 12px;
+	border: 1px solid rgba(15, 157, 118, 0.35);
+	background: rgba(15, 157, 118, 0.08);
+	font-size: 14px;
+}
+.cdc-pay[data-state="seen"] .cdc-seen-note { display: block; }
+.cdc-pay[data-state="seen"] .cdc-dot { background: var(--cdc-accent); }
+.cdc-pay[data-state="seen"] .cdc-dot::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: inherit;
+	animation: cdc-ping 1.6s var(--cdc-ease) infinite;
+}
+.cdc-pay[data-state="seen"] .cdc-timer,
+.cdc-pay[data-state="seen"] .cdc-progress { visibility: hidden; }
+.cdc-pay[data-state="expired"] .cdc-warn,
+.cdc-pay[data-state="expired"] .cdc-more:not([data-cdc="txid-box"]) { display: none; }
+
+.cdc-more {
+	border-top: 1px solid var(--cdc-line);
+	padding: 12px 0 0;
+	margin-top: 12px;
+	font-size: 14px;
+}
+.cdc-more summary {
+	cursor: pointer;
+	font-weight: 600;
+	border-radius: 6px;
+}
+.cdc-more p { margin: 8px 0 0; }
+
+.cdc-txid {
+	display: flex;
+	gap: 8px;
+	margin-top: 12px;
+}
+.cdc-txid input {
+	flex: 1;
+	min-width: 0;
+	min-height: 40px;
+	padding: 8px 12px;
+	border: 1px solid var(--cdc-line);
+	border-radius: 12px;
+	background: transparent;
+	color: inherit;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 13px;
+}
+.cdc-msg { margin: 8px 0 0; font-size: 14px; min-height: 1px; }
+.cdc-msg.is-error { color: var(--cdc-danger); }
+.cdc-msg.is-ok { color: var(--cdc-accent); }
+
+/* State views */
+.cdc-view-paid { display: none; text-align: center; padding: 8px 0; }
+.cdc-pay[data-state="paid"] .cdc-view-pay,
+.cdc-pay[data-state="late_paid"] .cdc-view-pay { display: none; }
+.cdc-pay[data-state="paid"] .cdc-view-paid,
+.cdc-pay[data-state="late_paid"] .cdc-view-paid { display: block; animation: cdc-in 320ms var(--cdc-ease) both; }
+.cdc-pay[data-state="paid"] .cdc-timer,
+.cdc-pay[data-state="late_paid"] .cdc-timer,
+.cdc-pay[data-state="expired"] .cdc-timer,
+.cdc-pay[data-state="paid"] .cdc-progress,
+.cdc-pay[data-state="late_paid"] .cdc-progress { visibility: hidden; }
+
+.cdc-check { width: 64px; height: 64px; margin: 0 auto 16px; }
+.cdc-check svg { width: 100%; height: 100%; fill: none; stroke: var(--cdc-accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.cdc-check circle { stroke-dasharray: 151; stroke-dashoffset: 151; animation: cdc-draw 500ms var(--cdc-ease) forwards; }
+.cdc-check path { stroke-dasharray: 36; stroke-dashoffset: 36; animation: cdc-draw 300ms 350ms var(--cdc-ease) forwards; }
+@keyframes cdc-draw { to { stroke-dashoffset: 0; } }
+.cdc-paid-text { margin: 0 auto 16px; max-width: 420px; color: var(--cdc-muted); }
+.cdc-link { font-weight: 600; color: var(--cdc-accent); }
+
+/* Phones */
+@media (max-width: 480px) {
+	.cdc-pay { padding: 16px; margin: 24px 0; }
+	.cdc-amount { font-size: 28px; }
+	.cdc-field-wallet { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+	.cdc-wallet { width: 100%; }
+	.cdc-wallet .cdc-copy { width: 100%; }
+	.cdc-txid { flex-direction: column; }
+	.cdc-btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cdc-pay,
+	.cdc-pay *,
+	.cdc-pay *::after { animation: none !important; transition: none !important; }
+	.cdc-check circle,
+	.cdc-check path { stroke-dashoffset: 0; }
+}
