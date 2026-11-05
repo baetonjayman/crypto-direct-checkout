@@ -50,6 +50,7 @@ class CDC_Pay_Page {
 		);
 		?>
 		<section class="cdc-pay" data-state="<?php echo esc_attr( $status ); ?>" data-config="<?php echo esc_attr( wp_json_encode( $config ) ); ?>" aria-labelledby="cdc-heading">
+			<div class="cdc-inner">
 
 			<header class="cdc-head">
 				<div class="cdc-pill" role="status" aria-live="polite">
@@ -158,6 +159,7 @@ class CDC_Pay_Page {
 			</div>
 
 			<noscript><p class="cdc-msg">Turn on JavaScript to see live payment status. You can also refresh this page after paying.</p></noscript>
+			</div>
 		</section>
 		<?php
 	}

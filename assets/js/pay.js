@@ -44,6 +44,10 @@
 		} catch (e) { qrEl.style.display = 'none'; }
 	}
 
+	/* ---- Phones: QR goes behind a button (a phone can't scan its own screen) ---- */
+	if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+		box.classList.add('cdc-touch');
+	}
 	/* ---- "Show QR code" on phones (a phone can't scan its own screen) ---- */
 	var scan = $('scan');
 	var toggle = scan && scan.querySelector('.cdc-scan-toggle');

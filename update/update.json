@@ -1,10 +1,10 @@
 {
-  "version": "1.3.4",
-  "package": "https://raw.githubusercontent.com/baetonjayman/crypto-direct-checkout/main/update/crypto-direct-checkout-1.3.4.zip",
-  "sha256": "0186d3f4376f8b205dfd5261a2162a5e2e64a53932d8820db1c890a4f9db77a7",
-  "signature": "NdKI5tAdkVwm+Zbts4CmZ8AwZgrRtRmtiyXTqLculmwKekhWdt+Br0ckY5kViypRxd4+s3A/b27EmGPQmj3eBQ==",
+  "version": "1.3.5",
+  "package": "https://raw.githubusercontent.com/baetonjayman/crypto-direct-checkout/main/update/crypto-direct-checkout-1.3.5.zip",
+  "sha256": "749684f1accf487b3eea03163826c58c33aeb0ce5fb84a4de39a91048277d540",
+  "signature": "Aq2wd+yeOUHb/Nvt4hMk3OyuRfeehxL1OIjzp24OYqkcIbqf3sOLN59lOBdZ2ko7PjPLxTu5apyZCeP23VxuBw==",
   "requires": "6.0",
   "requires_php": "7.4",
   "tested": "6.9",
-  "changelog": "Cleaner, more compact payment screen: amount and address in one box, address shown in easy-to-check blocks, QR beside it on desktop and behind 'Show QR code' on phones, 'Open in wallet app' for Bitcoin."
+  "changelog": "Payment box now adapts to the space the theme gives it (side columns included) and ignores theme button styles. QR stays visible on computers; hidden behind 'Show QR code' only on phones."
 }

@@ -15,7 +15,10 @@
 	box-sizing: border-box;
 	max-width: 640px;
 	margin: 32px 0;
-	padding: 24px;
+	padding: 0;
+	/* Layout follows the space the theme gives the box, not the screen size. */
+	container-type: inline-size;
+	container-name: cdc;
 	border: 1px solid var(--cdc-line);
 	border-radius: 20px;
 	background: var(--cdc-soft);
@@ -33,6 +36,27 @@
 .cdc-pay *,
 .cdc-pay *::before,
 .cdc-pay *::after { box-sizing: inherit; }
+.cdc-inner { padding: 24px; }
+
+/* Themes often restyle every button (uppercase, fixed widths, big padding). Undo that here. */
+.cdc-pay button,
+.cdc-pay .cdc-btn,
+.cdc-pay .cdc-copy {
+	text-transform: none;
+	letter-spacing: normal;
+	line-height: 1.2;
+	width: auto;
+	height: auto;
+	min-width: 0;
+	margin: 0;
+	float: none;
+	position: relative;
+	box-shadow: none;
+	text-shadow: none;
+	text-decoration: none;
+	white-space: nowrap;
+}
+.cdc-pay code { background: none; padding: 0; border: 0; }
 
 @keyframes cdc-in {
 	from { opacity: 0; transform: translateY(8px); }
@@ -391,12 +415,12 @@
 .cdc-paid-text { margin: 0 auto 16px; max-width: 420px; color: var(--cdc-muted); }
 .cdc-link { font-weight: 600; color: var(--cdc-accent); }
 
-/* Phones */
-@media (max-width: 560px) {
+/* Narrow box (phones, or a theme's side column) */
+@container cdc (max-width: 560px) {
 	.cdc-grid { grid-template-columns: 1fr; gap: 12px; }
 	.cdc-line .cdc-amount { font-size: 24px; }
 	.cdc-line .cdc-amount small { font-size: 14px; }
-	.cdc-scan-toggle {
+	.cdc-touch .cdc-scan-toggle {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -412,20 +436,61 @@
 		font-weight: 600;
 		cursor: pointer;
 	}
-	.cdc-scan-toggle:focus-visible { outline: 2px solid var(--cdc-accent); outline-offset: 2px; }
-	.cdc-scan-panel { display: none; padding-top: 12px; }
-	.cdc-scan[data-open] .cdc-scan-panel { display: block; animation: cdc-in 220ms var(--cdc-ease) both; }
-	.cdc-open-wallet { display: flex; width: 100%; margin-top: 8px; }
+	.cdc-touch .cdc-scan-toggle:focus-visible { outline: 2px solid var(--cdc-accent); outline-offset: 2px; }
+	.cdc-touch .cdc-scan-panel { display: none; padding-top: 12px; }
+	.cdc-touch .cdc-scan[data-open] .cdc-scan-panel { display: block; animation: cdc-in 220ms var(--cdc-ease) both; }
+	.cdc-touch .cdc-open-wallet { display: flex; justify-content: center; width: 100%; margin-top: 8px; }
+
+}
+@container cdc (max-width: 400px) {
+	.cdc-inner { padding: 16px; }
+	.cdc-txid { flex-direction: column; }
+	.cdc-pay .cdc-btn { width: 100%; }
+	.cdc-line { flex-wrap: wrap; }
+	.cdc-line-main { flex: 1 1 100%; }
+	.cdc-line .cdc-copy { flex: 1 1 100%; justify-content: center; }
+	.cdc-pay .cdc-scan-toggle,
+	.cdc-pay .cdc-open-wallet { width: 100%; }
 }
 
-@media (max-width: 480px) {
-	.cdc-pay { padding: 16px; margin: 24px 0; }
-	.cdc-amount { font-size: 28px; }
-	.cdc-field-wallet { grid-template-columns: 1fr; justify-items: center; text-align: center; }
-	.cdc-wallet { width: 100%; }
-	.cdc-wallet .cdc-copy { width: 100%; }
+/* Browsers without container queries fall back to screen width */
+@supports not (container-type: inline-size) {
+	@media (max-width: 560px) {
+	.cdc-grid { grid-template-columns: 1fr; gap: 12px; }
+	.cdc-line .cdc-amount { font-size: 24px; }
+	.cdc-line .cdc-amount small { font-size: 14px; }
+	.cdc-touch .cdc-scan-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		width: 100%;
+		min-height: 40px;
+		border: 1px dashed var(--cdc-line);
+		border-radius: 12px;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.cdc-touch .cdc-scan-toggle:focus-visible { outline: 2px solid var(--cdc-accent); outline-offset: 2px; }
+	.cdc-touch .cdc-scan-panel { display: none; padding-top: 12px; }
+	.cdc-touch .cdc-scan[data-open] .cdc-scan-panel { display: block; animation: cdc-in 220ms var(--cdc-ease) both; }
+	.cdc-touch .cdc-open-wallet { display: flex; justify-content: center; width: 100%; margin-top: 8px; }
+
+	}
+	@media (max-width: 400px) {
+	.cdc-inner { padding: 16px; }
 	.cdc-txid { flex-direction: column; }
-	.cdc-btn { width: 100%; }
+	.cdc-pay .cdc-btn { width: 100%; }
+	.cdc-line { flex-wrap: wrap; }
+	.cdc-line-main { flex: 1 1 100%; }
+	.cdc-line .cdc-copy { flex: 1 1 100%; justify-content: center; }
+	.cdc-pay .cdc-scan-toggle,
+	.cdc-pay .cdc-open-wallet { width: 100%; }
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
