@@ -126,7 +126,9 @@ class CDC_Updater {
 		if ( self::basename() !== $plugin_file ) {
 			return $update;
 		}
-		$m = self::manifest();
+		// "Check again" on Dashboard → Updates should really check again.
+		$force = is_admin() && isset( $_GET['force-check'] ) && current_user_can( 'update_plugins' ); // phpcs:ignore WordPress.Security.NonceVerification
+		$m     = self::manifest( $force );
 		if ( ! $m ) {
 			return $update;
 		}
