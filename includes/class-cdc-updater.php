@@ -182,9 +182,11 @@ class CDC_Updater {
 		if ( ! $ours && ( ! $m || $package !== $m['package'] ) ) {
 			return $reply; // Not our plugin.
 		}
-		if ( ! $m || $package !== $m['package'] ) {
-			return new WP_Error( 'cdc_update_mismatch', 'Crypto Direct Checkout update blocked: the download link doesn\'t match the published update. Nothing was changed.' );
+		if ( ! $m ) {
+			return new WP_Error( 'cdc_update_mismatch', 'Crypto Direct Checkout update blocked: the published update information couldn\'t be read. Nothing was changed. Please try again later.' );
 		}
+		// WordPress may still be offering an older release; always install the newest signed one.
+		$package = $m['package'];
 		if ( version_compare( $m['version'], CDC_VERSION, '<=' ) ) {
 			return new WP_Error( 'cdc_update_old', 'Crypto Direct Checkout update blocked: it is not newer than the installed version. Nothing was changed.' );
 		}
