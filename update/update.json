@@ -1,10 +1,10 @@
 {
-  "version": "1.3.0",
-  "package": "https://raw.githubusercontent.com/baetonjayman/crypto-direct-checkout/main/update/crypto-direct-checkout-1.3.0.zip",
-  "sha256": "bfe1313a50380dee395f4f2e8f12ca1b780baac953944e800a58a8f891fb222c",
-  "signature": "ab6DZQAy0SYlG6Qyzpur1ANHXAMBIEntNaAFFMri7lDZd/DQhZOOjA6GQdpuawHS8LpCHfF7fg9KYXGY5rLcCQ==",
+  "version": "1.3.1",
+  "package": "https://raw.githubusercontent.com/baetonjayman/crypto-direct-checkout/main/update/crypto-direct-checkout-1.3.1.zip",
+  "sha256": "e8ee7f72e0cf0b3feab8e9f4bde3b9da263e450433c27a43d8035ce6e9f44781",
+  "signature": "Z3ZZMlzruazYyyapHsysAudQNkLKTSZWhq39QdvIE0yT1+1w4t+w6SPDJNrUE67lRXnCq08IaLesmTXaHqUqCQ==",
   "requires": "6.0",
   "requires_php": "7.4",
   "tested": "6.9",
-  "changelog": "Automatic, signed updates from GitHub. Supports USDT (TRC20, ERC20) and Bitcoin."
+  "changelog": "Test release for automatic updates."
 }
